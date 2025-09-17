@@ -1,0 +1,97 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [ "main" ] # main 브랜치에 push될 때만 실행
+
+# 중복 배포 방지(같은 워크플로우 동시 실행 시 이전 것 취소)
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:  # Docker 이미지 빌드 + GHCR 푸시
+    runs-on : ubuntu-latest  #GitHub 제공 Ubuntu 러너에서 실행
+    permissions:
+      contents: read      # 코드 읽기 권한
+      packages: write     # GHCR에 push 권한
+    steps:
+      # 리포지토리 소스를 체크아웃 (Dockerfile 등 빌드에 필요)
+      - uses: actions/checkout@v4
+
+      #GHCR 로그인 (이후 docker push 시 인증 필요)
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}       # 현재 워크플로우 실행한 GitHub 사용자
+          password: ${{ secrets.GITHUB_TOKEN }} # GitHub가 자동 제공하는 토큰(푸시 권한 포함)
+
+      # 이미지 태그 변수 세팅
+      - name: Set image tags
+        id: vars
+        run: |
+          # 이미지 이름: ghcr.io/owner/repo (소문자 변환)
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}
+          echo "IMAGE=$IMAGE" >> "$GITHUB_OUTPUT"
+          # 커밋 SHA 앞 7자리 -> 버전 태그용
+          echo "TAG_SHA=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      #Docker 이미지 빌드 & GHCR 푸시
+      - name: Build & Push image (latest + sha)
+        uses: docker/build-push-action@v6
+        with:
+          context: .  # 현재 리포 폴더를 빌드 컨텍스트로 사용
+          push: true  # 빌드 후 레지스트리에 푸시
+          tags: |  # 두가지 태그로 푸시
+            ${{ steps.vars.outputs.IMAGE }}:latest  #latest 태그
+            ${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.TAG_SHA }}   # 커밋 SHA기반 태그
+
+  #서버에 SSH 접속해 배포하는 잡
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH pull repo & deploy with compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}        # 서버 주소 (Secrets에 저장)
+          username: ${{ secrets.SERVER_USER }}    # 서버 유저명 (예: ubuntu)
+          key: ${{ secrets.SERVER_SSH_KEY }}      # SSH private key (Secrets)
+          script: |
+              set -e                                # 오류 발생 시 즉시 종료
+            
+              REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+              APP_DIR="${{ secrets.SERVER_APP_DIR }}" 
+
+              # 레포 최신화 (없으면 최초 clone, 있으면 pull)
+              if [ ! -d "$APP_DIR/.git" ]; then
+                mkdir -p "$APP_DIR"
+                git clone --depth 1 "$REPO_URL" "$APP_DIR"
+              else
+                cd "$APP_DIR"
+                git fetch --all --prune
+                git reset --hard origin/main
+              fi
+
+              cd "$APP_DIR" # 서버에서 프로젝트 디렉토리 이동
+              
+              # 환경변수 주입 (Secrets 값 활용, .env 없이 export 방식)
+              export DB_USERNAME=${{ secrets.DB_USERNAME }}
+              export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+              export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+              
+              # GHCR 로그인 (서버에서도 pull 가능하도록)
+              docker login ghcr.io -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}'
+              
+              # 최신 이미지 받아오기
+              docker compose -f docker-compose.prod.yml pull
+              
+              # 컨테이너 백그라운드 실행 (갱신 포함)
+              docker compose -f docker-compose.prod.yml up -d
+              
+              # 오래된 이미지 정리 (디스크 관리)
+              docker image prune -f
+            
+              #헬스체크
+              curl -fsS http://127.0.0.1:8088/actuator/health || (echo "Health check failed" && exit 1)

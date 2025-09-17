@@ -39,3 +39,4 @@ out/
 *.yml
 !docker-compose.prod.yml
 !src/main/resources/application-prod.yml
+!.github/workflows/deploy.yml

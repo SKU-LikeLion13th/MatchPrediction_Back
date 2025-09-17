@@ -59,7 +59,7 @@ jobs:
           script: |
               set -e                               
             
-              REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+              REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
               APP_DIR="${{ secrets.SERVER_APP_DIR }}" 
 
               if [ ! -d "$APP_DIR/.git" ]; then

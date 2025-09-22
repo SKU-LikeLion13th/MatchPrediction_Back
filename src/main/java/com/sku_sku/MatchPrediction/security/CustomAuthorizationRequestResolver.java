@@ -38,7 +38,6 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
 
         String customState = servletRequest.getParameter("state");
 
-        // 필수 처리: null 또는 빈 문자열이면 기본값 주입
         if (customState == null || customState.isBlank()) {
             customState = "/";
         }

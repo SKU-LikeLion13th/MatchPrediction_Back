@@ -47,12 +47,12 @@ public class Student implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null; // 비밀번호 인증 안 쓸 경우 null
+        return null;
     }
 
     @Override
     public String getUsername() {
-        return email; // Security 식별자
+        return email;
     }
 
     @Override

@@ -58,13 +58,11 @@ public class PredictionService {
 
     @Transactional
     public void gradeMatchBySport(ReqGrade reqGrade) {
-        // 1) Match 결과 업데이트
         MatchResult matchResult = matchResultRepository.findBySportType(reqGrade.sportType())
                 .orElseGet(() -> new MatchResult(reqGrade.sportType())); // 없으면 생성
         matchResult.gradeMatch(reqGrade.predictionResult());
         matchResultRepository.save(matchResult);
 
-        // 2) Prediction 채점
         List<Prediction> predictionList = predictionRepository.findBySportType(reqGrade.sportType());
 
         if (predictionList.isEmpty()) {
@@ -74,7 +72,6 @@ public class PredictionService {
         predictionList.forEach(p -> p.checkCorrect(reqGrade.predictionResult()));
         predictionRepository.saveAll(predictionList);
 
-        // 3) PredictionSubmission 단위로 최종 채점 처리
         predictionList.stream()
                 .map(Prediction::getPredictionSubmission)
                 .distinct()
@@ -95,22 +92,21 @@ public class PredictionService {
                     List<Prediction> predictions = predictionRepository.findBySportType(sport);
 
                     long total = predictions.size();
-                    if (total == 0) total = 1; // 0 나누기 방지
+                    if (total == 0) total = 1;
 
-                    double teamAPercentage = predictions.stream()
+                    long teamACount = predictions.stream()
                             .filter(p -> p.getPredictionResult() == PredictionResult.TEAM_A)
-                            .count() * 100.0 / total;
+                            .count();
 
-                    double teamBPercentage = predictions.stream()
-                            .filter(p -> p.getPredictionResult() == PredictionResult.TEAM_B)
-                            .count() * 100.0 / total;
+                    int teamAPercentage = Math.toIntExact(Math.round(teamACount * 100.0 / total));
+
+                    int teamBPercentage = 100 - teamAPercentage;
 
                     List<PredictionStatisticsRes> predictionList = List.of(
                             new PredictionStatisticsRes("TEAM_A", teamAPercentage),
                             new PredictionStatisticsRes("TEAM_B", teamBPercentage)
                     );
 
-                    // ✅ 경기 결과 Match에서 가져오기
                     PredictionResult gameResult = matchResultRepository.findBySportType(sport)
                             .map(MatchResult::getGameResult)
                             .orElse(PredictionResult.BEFORE_THE_GAME);
@@ -119,5 +115,6 @@ public class PredictionService {
                 })
                 .toList();
     }
+
 
 }

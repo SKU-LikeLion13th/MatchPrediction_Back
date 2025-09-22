@@ -1,9 +1,12 @@
 package com.sku_sku.MatchPrediction.service;
 
+import com.sku_sku.MatchPrediction.domain.PredictionSubmission;
 import com.sku_sku.MatchPrediction.domain.Student;
 import com.sku_sku.MatchPrediction.dto.ReqSignup;
+import com.sku_sku.MatchPrediction.dto.SubmissionInfoRes;
 import com.sku_sku.MatchPrediction.enums.FeeStatus;
 import com.sku_sku.MatchPrediction.reposiroty.PaidStudentRepository;
+import com.sku_sku.MatchPrediction.reposiroty.PredictionSubmissionRepository;
 import com.sku_sku.MatchPrediction.reposiroty.StudentReposiroty;
 import com.sku_sku.MatchPrediction.security.JwtUtility;
 import jakarta.servlet.http.Cookie;
@@ -16,6 +19,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +28,7 @@ public class StudentService {
 
     private final StudentReposiroty studentReposiroty;
     private final PaidStudentRepository paidStudentRepository;
+    private final PredictionSubmissionRepository predictionSubmissionRepository;
     private final JwtUtility jwtUtility;
     private final RedisTemplate<String, String> redisTemplate;
     private final SignupJwtService signupJwtService;
@@ -33,6 +38,35 @@ public class StudentService {
 
     @Value("${cookie.sameSite}")
     private String isSameSite;
+
+    public int getRemainingTickets(Student student) {
+        int usedTickets = getMySubmissions(student).size();
+        System.out.println("usedTickets" + usedTickets);
+        return student.getFeeStatus() == FeeStatus.PAID ? 2 - usedTickets : 1 - usedTickets;
+    }
+
+    public List<PredictionSubmission> getMySubmissions(Student student) {
+        return predictionSubmissionRepository.findByStudent(student);
+    }
+
+    public SubmissionInfoRes getSubmissionInfo(Student student) {
+        int remainingTickets = getRemainingTickets(student);
+        System.out.println("remainingTickets" + remainingTickets);
+        List<PredictionSubmission> mySubmissions = getMySubmissions(student);
+
+        List<SubmissionInfoRes.PredictionResWrapper> submissionDtos = mySubmissions.stream()
+                .map(sub -> new SubmissionInfoRes.PredictionResWrapper(
+                        sub.getPredictionList().stream()
+                                .map(p -> new SubmissionInfoRes.PredictionRes(
+                                        p.getSportType(),
+                                        p.getPredictionResult()
+                                ))
+                                .toList()
+                ))
+                .toList();
+
+        return new SubmissionInfoRes(remainingTickets, submissionDtos);
+    }
 
     public ResponseCookie signup(ReqSignup reqSignup, HttpServletRequest request, HttpServletResponse response) {
         String email = extractEmailFromSignupCookie(request);

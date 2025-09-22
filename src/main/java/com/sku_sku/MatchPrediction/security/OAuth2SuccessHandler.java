@@ -37,12 +37,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
-
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
 
         Student student = studentReposiroty.findByEmail(email);
-
         if (student == null) {
             String signupJwt = signupJwtService.createSignupJwt(email);
             ResponseCookie cookie = ResponseCookie.from("signup_token", signupJwt)

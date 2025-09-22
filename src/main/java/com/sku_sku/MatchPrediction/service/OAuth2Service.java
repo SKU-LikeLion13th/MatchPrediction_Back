@@ -43,7 +43,8 @@ public class OAuth2Service {
                 "email", email,
                 "major", student.getMajor(),
                 "studentId", student.getStudentId(),
-                "name", student.getName()
+                "name", student.getName(),
+                "feeStatus", student.getFeeStatus()
         );
     }
 

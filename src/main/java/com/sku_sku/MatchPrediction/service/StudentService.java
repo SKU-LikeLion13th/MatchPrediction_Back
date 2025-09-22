@@ -73,7 +73,6 @@ public class StudentService {
                 student.getFeeStatus()
         );
 
-        // Refresh Token 생성 & Redis 저장
         String refreshToken = UUID.randomUUID().toString();
         redisTemplate.opsForValue().set(
                 "refresh:" + student.getEmail(),
@@ -81,7 +80,6 @@ public class StudentService {
                 Duration.ofDays(30)
         );
 
-        // HttpOnly Cookie 반환
         return ResponseCookie.from("access_token", jwt)
                 .httpOnly(true)
                 .secure(isSecure)
@@ -91,7 +89,6 @@ public class StudentService {
                 .build();
     }
 
-    // 쿠키에서 signup_token 읽어서 이메일 추출
     private String extractEmailFromSignupCookie(HttpServletRequest request) {
         if (request.getCookies() == null) {
             throw new IllegalStateException("쿠키가 존재하지 않습니다.");

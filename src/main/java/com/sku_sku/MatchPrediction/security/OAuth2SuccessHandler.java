@@ -55,13 +55,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
             response.addHeader("Set-Cookie", cookie.toString());
 
-            // 프론트로 단순 리다이렉트 (token은 URL에 안 보임)
-            response.sendRedirect("http://localhost:5173/signup");            return;
+            response.sendRedirect("http://localhost:5173/signup");
+            return;
         }
 
         String jwt = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus());
 
-        // JWT를 HttpOnly Cookie에 저장
         ResponseCookie cookie = ResponseCookie.from("access_token", jwt)
                 .httpOnly(true)
                 .secure(isSecure)
@@ -78,7 +77,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String redirectUrl = request.getParameter("state");
         System.out.println("redirectUrl: " + redirectUrl);
 
-        // 유저가 로그인 시도하기 전에 요청했던 URL로 리디렉트
         response.sendRedirect(redirectUrl);
     }
 }

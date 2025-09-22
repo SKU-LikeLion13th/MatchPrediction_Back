@@ -28,7 +28,6 @@ public class PredictionSubmission {
     private boolean grade;
     private boolean correct;
 
-    // 연관관계 편의 메서드
     public void addPrediction(Prediction prediction) {
         predictionList.add(prediction);
         prediction.setPredictionSubmission(this);

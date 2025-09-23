@@ -2,6 +2,7 @@ package com.sku_sku.MatchPrediction.service;
 
 
 import com.sku_sku.MatchPrediction.domain.Student;
+import com.sku_sku.MatchPrediction.dto.LoginInfoRes;
 import com.sku_sku.MatchPrediction.exception.InvalidJwtlException;
 import com.sku_sku.MatchPrediction.exception.InvalidLoginlException;
 import com.sku_sku.MatchPrediction.reposiroty.StudentReposiroty;
@@ -31,7 +32,7 @@ public class OAuth2Service {
     @Value("${cookie.sameSite}")
     private String isSameSite;
 
-    public Map<String, Object> getLoginStatus(Authentication authentication) {
+    public LoginInfoRes getLoginStatus(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new InvalidLoginlException("로그인이 안 되어 있음");
         }
@@ -39,12 +40,14 @@ public class OAuth2Service {
         String email = authentication.getName();
         Student student = studentReposiroty.findByEmail(email);
 
-        return Map.of(
-                "email", email,
-                "major", student.getMajor(),
-                "studentId", student.getStudentId(),
-                "name", student.getName(),
-                "feeStatus", student.getFeeStatus()
+        return new LoginInfoRes(
+                email,
+                student.getMajor(),
+                student.getStudentId(),
+                student.getName(),
+                student.getPhoneNum(),
+                student.getFeeStatus(),
+                student.getRoleType()
         );
     }
 

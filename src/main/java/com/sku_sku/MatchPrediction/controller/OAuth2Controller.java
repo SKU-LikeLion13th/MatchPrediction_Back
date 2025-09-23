@@ -1,5 +1,6 @@
 package com.sku_sku.MatchPrediction.controller;
 
+import com.sku_sku.MatchPrediction.dto.LoginInfoRes;
 import com.sku_sku.MatchPrediction.service.OAuth2Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +21,7 @@ public class OAuth2Controller {
     private final OAuth2Service oAuth2Service;
 
     @GetMapping("/status")
-    public ResponseEntity<?> loginStatus(Authentication authentication) {
+    public ResponseEntity<LoginInfoRes> loginStatus(Authentication authentication) {
         return ResponseEntity.status(HttpStatus.OK).body(oAuth2Service.getLoginStatus(authentication));
     }
 

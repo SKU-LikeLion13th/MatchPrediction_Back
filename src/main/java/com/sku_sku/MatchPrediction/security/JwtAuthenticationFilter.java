@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = jwtUtility.extractTokenFromCookies(request);
 
-        if (token != null) {
+        if (token != null && !token.isBlank()) {
             try {
                 if (jwtUtility.validateJwt(token)) {
                     Authentication auth = getAuthentication(token);
@@ -68,8 +68,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
                 // else: 다른 유저는 그냥 인증 없이 통과 → controller에서 401
             } catch (HandleJwtException e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write(e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP StatusCode 401로 설정
+                response.setContentType("application/json;charset=UTF-8"); // 응답 타입 JSON으로 설정 // REST API 표준에서는 JSON 형태로 에러 응답을 보내는 것이 관례
+                response.getWriter().write("{\"error message\": \"" + e.getMessage() + "\"}");
                 return;
             }
         }

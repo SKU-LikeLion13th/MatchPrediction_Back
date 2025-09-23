@@ -4,6 +4,7 @@ package com.sku_sku.MatchPrediction.config;
 import com.sku_sku.MatchPrediction.security.CustomAuthorizationRequestResolver;
 import com.sku_sku.MatchPrediction.security.JwtAuthenticationFilter;
 import com.sku_sku.MatchPrediction.security.OAuth2SuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +48,13 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/students/signup").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> // Security에서 인증과 권환 관련 예외를 직접 처리하는 블록
+                        exception.authenticationEntryPoint((request, response, authException) -> { // 인증이 필요하지만 인응이 없는 요청이 들어왔을 때 호출
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP StatusCode 401로 설정
+                            response.setContentType("application/json;charset=UTF-8"); // 응답 타입 JSON으로 설정 // REST API 표준에서는 JSON 형태로 에러 응답을 보내는 것이 관례
+                            response.getWriter().write("{\"error message\": \"인증 필요\"}"); // JSON 형태로 예외 메시지 response에 반환
+                        })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

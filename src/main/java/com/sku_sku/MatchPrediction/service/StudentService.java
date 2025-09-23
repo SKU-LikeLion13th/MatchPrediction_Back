@@ -80,6 +80,7 @@ public class StudentService {
                 reqSignup.major(),
                 reqSignup.studentId(),
                 reqSignup.name(),
+                reqSignup.phoneNum(),
                 paidStudentRepository.existsByStudentId(reqSignup.studentId()) ? FeeStatus.PAID : FeeStatus.UNPAID
         );
 

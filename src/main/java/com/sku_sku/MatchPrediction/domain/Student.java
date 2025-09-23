@@ -29,19 +29,22 @@ public class Student implements UserDetails {
 
     private String name;
 
+    private String phoneNum;
+
     @Enumerated(EnumType.STRING)
     private FeeStatus feeStatus;
 
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
-    public Student(String email, String major, String studentId, String name, FeeStatus feeStatus, RoleType roleType) {
+    public Student(String email, String major, String studentId, String name, String phoneNum, FeeStatus feeStatus) {
         this.email = email;
         this.major = major;
         this.studentId = studentId;
         this.name = name;
+        this.phoneNum = phoneNum;
         this.feeStatus = feeStatus;
-        this.roleType = roleType;
+        this.roleType = RoleType.STUDENT;
     }
 
     // UserDetails 필수 impl

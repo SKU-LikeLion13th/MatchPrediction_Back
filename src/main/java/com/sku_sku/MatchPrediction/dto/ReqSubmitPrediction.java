@@ -5,5 +5,6 @@ import com.sku_sku.MatchPrediction.enums.SportType;
 
 import java.util.List;
 
-public record ReqSubmitPrediction(Long id, List<SportType> sportTypeList, List<PredictionResult> predictionResultList) {
+public record ReqSubmitPrediction(List<PredictionRequest> predictionRequestList) {
+    public record PredictionRequest(SportType sportType, PredictionResult predictionResult) {}
 }

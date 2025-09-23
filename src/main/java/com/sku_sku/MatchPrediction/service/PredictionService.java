@@ -5,19 +5,16 @@ import com.sku_sku.MatchPrediction.domain.Prediction;
 import com.sku_sku.MatchPrediction.domain.PredictionSubmission;
 import com.sku_sku.MatchPrediction.domain.Student;
 import com.sku_sku.MatchPrediction.dto.PredictionStatisticsBySportRes;
-import com.sku_sku.MatchPrediction.dto.PredictionStatisticsRes;
 import com.sku_sku.MatchPrediction.dto.ReqGrade;
 import com.sku_sku.MatchPrediction.dto.ReqSubmitPrediction;
 import com.sku_sku.MatchPrediction.enums.FeeStatus;
 import com.sku_sku.MatchPrediction.enums.PredictionResult;
 import com.sku_sku.MatchPrediction.enums.SportType;
 import com.sku_sku.MatchPrediction.exception.InvalidSportTypeException;
-import com.sku_sku.MatchPrediction.exception.InvalidStudentPKException;
 import com.sku_sku.MatchPrediction.exception.LimitSubmissionException;
 import com.sku_sku.MatchPrediction.reposiroty.MatchResultRepository;
 import com.sku_sku.MatchPrediction.reposiroty.PredictionRepository;
 import com.sku_sku.MatchPrediction.reposiroty.PredictionSubmissionRepository;
-import com.sku_sku.MatchPrediction.reposiroty.StudentReposiroty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +27,14 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class PredictionService {
 
-    private final StudentReposiroty studentReposiroty;
     private final PredictionRepository predictionRepository;
     private final PredictionSubmissionRepository predictionSubmissionRepository;
     private final MatchResultRepository matchResultRepository;
 
     @Transactional
-    public PredictionSubmission submitPrediction(ReqSubmitPrediction reqSubmitPrediction) {
-        Student student = studentReposiroty.findById(reqSubmitPrediction.id())
-                .orElseThrow(InvalidStudentPKException::new);
+    public PredictionSubmission submitPrediction(Student student, ReqSubmitPrediction reqSubmitPrediction) {
+//        Student student = studentReposiroty.findById(reqSubmitPrediction.id())
+//                .orElseThrow(InvalidStudentPKException::new);
 
         int limit = (student.getFeeStatus() == FeeStatus.PAID) ? 2 : 1;
         int submissionCount = predictionSubmissionRepository.countByStudent(student);
@@ -47,19 +43,28 @@ public class PredictionService {
             throw new LimitSubmissionException();
         }
 
+        List<SportType> sportTypeList = reqSubmitPrediction.predictionRequestList().stream()
+                .map(ReqSubmitPrediction.PredictionRequest::sportType)
+                .toList();
+
+        List<PredictionResult> predictionResultList = reqSubmitPrediction.predictionRequestList().stream()
+                .map(ReqSubmitPrediction.PredictionRequest::predictionResult)
+                .toList();
+
         PredictionSubmission submission = PredictionSubmission.createSubmission(
                 student,
-                reqSubmitPrediction.sportTypeList(),
-                reqSubmitPrediction.predictionResultList()
+                sportTypeList,
+                predictionResultList
         );
 
         return predictionSubmissionRepository.save(submission);
     }
 
+
     @Transactional
     public void gradeMatchBySport(ReqGrade reqGrade) {
         MatchResult matchResult = matchResultRepository.findBySportType(reqGrade.sportType())
-                .orElseGet(() -> new MatchResult(reqGrade.sportType())); // 없으면 생성
+                .orElseGet(() -> new MatchResult(reqGrade.sportType()));
         matchResult.gradeMatch(reqGrade.predictionResult());
         matchResultRepository.save(matchResult);
 
@@ -99,12 +104,11 @@ public class PredictionService {
                             .count();
 
                     int teamAPercentage = Math.toIntExact(Math.round(teamACount * 100.0 / total));
-
                     int teamBPercentage = 100 - teamAPercentage;
 
-                    List<PredictionStatisticsRes> predictionList = List.of(
-                            new PredictionStatisticsRes("TEAM_A", teamAPercentage),
-                            new PredictionStatisticsRes("TEAM_B", teamBPercentage)
+                    List<PredictionStatisticsBySportRes.PredictionResWrapper> predictionList = List.of(
+                            new PredictionStatisticsBySportRes.PredictionResWrapper("TEAM_A", teamAPercentage),
+                            new PredictionStatisticsBySportRes.PredictionResWrapper("TEAM_B", teamBPercentage)
                     );
 
                     PredictionResult gameResult = matchResultRepository.findBySportType(sport)
@@ -115,6 +119,4 @@ public class PredictionService {
                 })
                 .toList();
     }
-
-
 }

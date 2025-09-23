@@ -43,10 +43,10 @@ public class SecurityConfig {
                         .successHandler(oAuth2SuccessHandler)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**").permitAll()
-                                // ALL
-                        .requestMatchers("/students/**").authenticated()
-                                .anyRequest().permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/students/signup").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

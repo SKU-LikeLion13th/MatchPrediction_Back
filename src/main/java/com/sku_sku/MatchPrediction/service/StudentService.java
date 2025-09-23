@@ -104,7 +104,8 @@ public class StudentService {
                 student.getMajor(),
                 student.getStudentId(),
                 student.getName(),
-                student.getFeeStatus()
+                student.getFeeStatus(),
+                student.getRoleType()
         );
 
         String refreshToken = UUID.randomUUID().toString();

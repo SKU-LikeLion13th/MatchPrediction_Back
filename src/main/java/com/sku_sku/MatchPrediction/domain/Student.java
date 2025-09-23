@@ -1,6 +1,7 @@
 package com.sku_sku.MatchPrediction.domain;
 
 import com.sku_sku.MatchPrediction.enums.FeeStatus;
+import com.sku_sku.MatchPrediction.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,12 +32,16 @@ public class Student implements UserDetails {
     @Enumerated(EnumType.STRING)
     private FeeStatus feeStatus;
 
-    public Student(String email, String major, String studentId, String name, FeeStatus feeStatus) {
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
+
+    public Student(String email, String major, String studentId, String name, FeeStatus feeStatus, RoleType roleType) {
         this.email = email;
         this.major = major;
         this.studentId = studentId;
         this.name = name;
         this.feeStatus = feeStatus;
+        this.roleType = roleType;
     }
 
     // UserDetails 필수 impl

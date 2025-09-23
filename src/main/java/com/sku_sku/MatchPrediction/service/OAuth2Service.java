@@ -75,7 +75,7 @@ public class OAuth2Service {
         }
 
         Student student = studentReposiroty.findByEmail(email);
-        String newAccessToken = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus());
+        String newAccessToken = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus(), student.getRoleType());
 
         ResponseCookie cookie = ResponseCookie.from("access_token", newAccessToken)
                 .httpOnly(true)
@@ -95,7 +95,7 @@ public class OAuth2Service {
         }
 
         Student student = studentReposiroty.findByEmail(email);
-        String newAccessToken = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus());
+        String newAccessToken = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus(), student.getRoleType());
 
         ResponseCookie cookie = ResponseCookie.from("access_token", newAccessToken)
                 .httpOnly(true)

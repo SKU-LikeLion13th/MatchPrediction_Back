@@ -3,6 +3,7 @@ package com.sku_sku.MatchPrediction.security;
 
 
 import com.sku_sku.MatchPrediction.enums.FeeStatus;
+import com.sku_sku.MatchPrediction.enums.RoleType;
 import com.sku_sku.MatchPrediction.exception.HandleJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -28,7 +29,7 @@ public class JwtUtility {
     }
 
     // JWT 토큰 생성
-    public String generateJwt(String email, String major, String studentId, String name, FeeStatus feeStatus) {
+    public String generateJwt(String email, String major, String studentId, String name, FeeStatus feeStatus, RoleType roleType) {
         Instant now = Instant.now();
         return Jwts.builder() // JWT 빌더 초기화
                 .claims() // Claims 설정
@@ -37,6 +38,7 @@ public class JwtUtility {
                 .add("studentId", studentId)
                 .add("name", name)
                 .add("feeStatus", feeStatus.name())
+                .add("role", roleType.name())
                 .issuedAt(Date.from(now)) // JWT 발행 시간 설정
                 .expiration(Date.from(now.plusMillis(expirationTime))) // JWT 만료 시간 설정
                 .and() // claims() 닫기

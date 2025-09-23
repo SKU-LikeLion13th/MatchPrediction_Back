@@ -57,7 +57,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
 
-        String jwt = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus());
+        String jwt = jwtUtility.generateJwt(email, student.getMajor(), student.getStudentId(), student.getName(), student.getFeeStatus(), student.getRoleType());
 
         ResponseCookie cookie = ResponseCookie.from("access_token", jwt)
                 .httpOnly(true)

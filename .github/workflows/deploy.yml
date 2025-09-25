@@ -76,8 +76,10 @@ jobs:
               export DB_USERNAME=${{ secrets.DB_USERNAME }}
               export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
               export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
-              export CLIENT_ID=${{ secrets.CLIENT_ID }}            # ← 추가
-              export CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} 
+              export CLIENT_ID=${{ secrets.CLIENT_ID }} 
+              export CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+              export CLIENT_ID=${{ secrets.REDIS_HOST }} 
+              export CLIENT_SECRET=${{ secrets.REDIS_PORT }} 
             
               docker login ghcr.io -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}'
               
@@ -86,4 +88,4 @@ jobs:
               docker compose -f docker-compose.prod.yml up -d
               
               docker image prune -f
-          
+            

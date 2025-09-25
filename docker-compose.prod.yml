@@ -37,7 +37,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
-      REDIS_HOST: redis
+      REDIS_HOST: mp-redis
       REDIS_PORT: 6379
     ports:
       - "8088:8080"    # Nginx가 127.0.0.1:8088으로 프록시

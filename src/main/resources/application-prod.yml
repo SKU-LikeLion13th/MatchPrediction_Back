@@ -14,11 +14,45 @@ spring:
         show_sql: true
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 
+            scope:
+              - profile
+              - email
+            authorization-grant-type: authorization_code
+            client-name: Google
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+jwt:
+  base64Secret: "Cb2w55+PfHK9R6W6pRujXTxmztcYEx+EA0m92Wys2DDr9s/FVLoDOE8n2jLKf40j4CpbRvTWDRq5dqrhcPCdCw=="
+url:
+  access-token: https://oauth2.googleapis.com/token
+  profile: https://www.googleapis.com/oauth2/v3/userinfo
+
+cookie:
+  secure: true
+  sameSite: None
+
 
 

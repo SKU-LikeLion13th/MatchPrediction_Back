@@ -35,8 +35,8 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      host: mp-redis
+      port: 6379
       timeout: 60000
 management:
   endpoints:

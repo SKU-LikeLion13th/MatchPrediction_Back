@@ -78,8 +78,8 @@ jobs:
               export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
               export CLIENT_ID=${{ secrets.CLIENT_ID }} 
               export CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
-              export CLIENT_ID=${{ secrets.REDIS_HOST }} 
-              export CLIENT_SECRET=${{ secrets.REDIS_PORT }} 
+              export REDIS_HOST=${{ secrets.REDIS_HOST }} 
+              export REDIS_PORT=${{ secrets.REDIS_PORT }} 
             
               docker login ghcr.io -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}'
               

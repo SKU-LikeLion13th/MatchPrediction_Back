@@ -76,7 +76,9 @@ jobs:
               export DB_USERNAME=${{ secrets.DB_USERNAME }}
               export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
               export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
-              
+              export CLIENT_ID=${{ secrets.CLIENT_ID }}            # ← 추가
+              export CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} 
+            
               docker login ghcr.io -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}'
               
               docker compose -f docker-compose.prod.yml pull

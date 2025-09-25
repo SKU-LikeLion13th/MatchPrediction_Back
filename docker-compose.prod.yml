@@ -18,6 +18,12 @@ services:
     # ※ 필요할 때만 외부 접속 임시 허용 (보안상 기본은 닫기)
     # ports:
     #   - "3307:3306"
+  redis:
+    image: redis:7
+    container_name: mp-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
 
   app:
     image: ghcr.io/sku-likelion13th/matchprediction_back:latest   # ← GitHub Actions가 푸시하는 이미지 태그로 교체
@@ -29,8 +35,10 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-      CLIENT_ID: ${CLIENT_ID}          # ← 추가
+      CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8088:8080"    # Nginx가 127.0.0.1:8088으로 프록시
     restart: unless-stopped

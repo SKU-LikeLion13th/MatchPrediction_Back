@@ -4,6 +4,7 @@ package com.sku_sku.MatchPrediction.security;
 
 import com.sku_sku.MatchPrediction.domain.Student;
 import com.sku_sku.MatchPrediction.enums.FeeStatus;
+import com.sku_sku.MatchPrediction.enums.RoleType;
 import com.sku_sku.MatchPrediction.exception.HandleJwtException;
 import com.sku_sku.MatchPrediction.reposiroty.StudentReposiroty;
 import com.sku_sku.MatchPrediction.service.OAuth2Service;
@@ -17,13 +18,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -82,11 +84,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims claims = jwtUtility.getClaimsFromJwt(jwt);
         Student student = studentReposiroty.findByEmail(claims.getSubject());
         FeeStatus feeStatus = FeeStatus.valueOf(claims.get("feeStatus", String.class));
+        RoleType roleType = RoleType.valueOf(claims.get("role", String.class));
+
+        List<GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + roleType.name()),
+                new SimpleGrantedAuthority(feeStatus.name())
+        );
 
         return new UsernamePasswordAuthenticationToken(
                 student,
                 null,
-                Collections.singletonList(new SimpleGrantedAuthority(feeStatus.name()))
+                authorities
         );
     }
+
 }

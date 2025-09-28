@@ -45,10 +45,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/prediction/**").hasAnyRole("ADMIN", "STUDENT")
+                        .requestMatchers("/prediction/submit").hasAnyRole("ADMIN", "STUDENT")
                         .requestMatchers("/log/**").hasAnyRole("ADMIN", "STUDENT")
                         .requestMatchers("/students/submission/info").hasAnyRole("ADMIN", "STUDENT")
                         .anyRequest().permitAll()
+//                        .anyRequest().authenticated()
                 )
 //                .exceptionHandling(exception -> // Security에서 인증과 권환 관련 예외를 직접 처리하는 블록
 //                        exception.authenticationEntryPoint((request, response, authException) -> { // 인증이 필요하지만 인응이 없는 요청이 들어왔을 때 호출

@@ -84,6 +84,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             } else if (redirectUrl.startsWith("https://solvit-final")) {
                 response.sendRedirect("https://solvit-final.sku-sku.com/matchinfo");
             }
+            return;
         }
         response.sendRedirect(redirectUrl);
     }

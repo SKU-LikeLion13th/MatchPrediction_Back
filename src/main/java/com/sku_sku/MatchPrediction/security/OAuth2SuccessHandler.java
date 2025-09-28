@@ -53,7 +53,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
             response.addHeader("Set-Cookie", cookie.toString());
 
-            response.sendRedirect("http://localhost:5173/member");
+            response.sendRedirect("https://solvit-final.sku-sku.com/member");
             return;
         }
 

@@ -38,6 +38,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        String redirectUrl = request.getParameter("state");
         String email = oAuth2User.getAttribute("email");
 
         Student student = studentReposiroty.findByEmail(email);
@@ -52,8 +53,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             response.addHeader("Set-Cookie", cookie.toString());
-
-            response.sendRedirect("https://solvit-final.sku-sku.com/member");
+            if (redirectUrl.startsWith("http://localhost")) {
+                response.sendRedirect("http://localhost:5173/member");
+            } else if (redirectUrl.startsWith("https://solvit-final")) {
+                response.sendRedirect("https://solvit-final.sku-sku.com/member");
+            }
             return;
         }
 
@@ -72,7 +76,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = UUID.randomUUID().toString();
         redisTemplate.opsForValue().set("refresh:" + email, refreshToken, Duration.ofDays(30));
 
-        String redirectUrl = request.getParameter("state");
+//        String redirectUrl = request.getParameter("state");
         System.out.println("redirectUrl: " + redirectUrl);
         if (redirectUrl.endsWith("/Login")) {
             if (redirectUrl.startsWith("http://localhost")) {

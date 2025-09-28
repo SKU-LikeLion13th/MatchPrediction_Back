@@ -1,5 +1,6 @@
 package com.sku_sku.MatchPrediction.controller;
 
+import com.sku_sku.MatchPrediction.domain.Student;
 import com.sku_sku.MatchPrediction.dto.LoginInfoRes;
 import com.sku_sku.MatchPrediction.service.OAuth2Service;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +23,8 @@ public class OAuth2Controller {
     private final OAuth2Service oAuth2Service;
 
     @GetMapping("/status")
-    public ResponseEntity<LoginInfoRes> loginStatus(Authentication authentication) {
-        return ResponseEntity.status(HttpStatus.OK).body(oAuth2Service.getLoginStatus(authentication));
+    public ResponseEntity<LoginInfoRes> loginStatus(@AuthenticationPrincipal Student student) {
+        return ResponseEntity.status(HttpStatus.OK).body(oAuth2Service.getLoginStatus(student));
     }
 
     @PostMapping("/out")

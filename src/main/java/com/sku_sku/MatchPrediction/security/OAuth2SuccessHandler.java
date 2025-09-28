@@ -52,8 +52,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             response.addHeader("Set-Cookie", cookie.toString());
-
-            response.sendRedirect("https://solvit-final.sku-sku.com/member");
+            String redirectUrl = request.getParameter("state");
+            if (redirectUrl == "https://solvit-final.sku-sku.com/Login") {
+                response.sendRedirect("https://solvit-final.sku-sku.com/member");
+            }
+            response.sendRedirect(redirectUrl);
             return;
         }
 

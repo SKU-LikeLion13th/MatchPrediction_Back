@@ -23,8 +23,8 @@ public class OAuth2Controller {
     private final OAuth2Service oAuth2Service;
 
     @GetMapping("/status")
-    public ResponseEntity<LoginInfoRes> loginStatus(@AuthenticationPrincipal Student student) {
-        return ResponseEntity.status(HttpStatus.OK).body(oAuth2Service.getLoginStatus(student));
+    public ResponseEntity<LoginInfoRes> loginStatus(Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(oAuth2Service.getLoginStatus(authentication));
     }
 
     @PostMapping("/out")

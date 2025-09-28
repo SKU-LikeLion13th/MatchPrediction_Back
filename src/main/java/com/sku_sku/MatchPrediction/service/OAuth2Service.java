@@ -31,16 +31,16 @@ public class OAuth2Service {
     @Value("${cookie.sameSite}")
     private String isSameSite;
 
-    public LoginInfoRes getLoginStatus(Student student) {
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new InvalidLoginlException("로그인이 안 되어 있음");
-//        }
-        if (student == null) {
+    public LoginInfoRes getLoginStatus(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new InvalidLoginlException("로그인이 안 되어 있음");
         }
+//        if (student == null) {
+//            throw new InvalidLoginlException("로그인이 안 되어 있음");
+//        }
 
-//        String email = authentication.getName();
-//        Student student = studentReposiroty.findByEmail(email);
+        String email = authentication.getName();
+        Student student = studentReposiroty.findByEmail(email);
 
         return new LoginInfoRes(
                 student.getEmail(),

@@ -97,14 +97,21 @@ public class PredictionService {
                     List<Prediction> predictions = predictionRepository.findBySportType(sport);
 
                     long total = predictions.size();
-                    if (total == 0) total = 1;
 
-                    long teamACount = predictions.stream()
-                            .filter(p -> p.getPredictionResult() == PredictionResult.TEAM_A)
-                            .count();
+                    int teamAPercentage;
+                    int teamBPercentage;
 
-                    int teamAPercentage = Math.toIntExact(Math.round(teamACount * 100.0 / total));
-                    int teamBPercentage = 100 - teamAPercentage;
+                    if (total == 0) {
+                        teamAPercentage = 50;
+                        teamBPercentage = 50;
+                    } else {
+                        long teamACount = predictions.stream()
+                                .filter(p -> p.getPredictionResult() == PredictionResult.TEAM_A)
+                                .count();
+
+                        teamAPercentage = Math.toIntExact(Math.round(teamACount * 100.0 / total));
+                        teamBPercentage = 100 - teamAPercentage;
+                    }
 
                     List<PredictionStatisticsBySportRes.PredictionResWrapper> predictionList = List.of(
                             new PredictionStatisticsBySportRes.PredictionResWrapper("TEAM_A", teamAPercentage),
@@ -119,4 +126,5 @@ public class PredictionService {
                 })
                 .toList();
     }
+
 }

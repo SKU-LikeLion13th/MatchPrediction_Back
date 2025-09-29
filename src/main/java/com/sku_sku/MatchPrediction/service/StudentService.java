@@ -53,7 +53,7 @@ public class StudentService {
         int remainingTickets = getRemainingTickets(student);
         System.out.println("remainingTickets" + remainingTickets);
         List<PredictionSubmission> mySubmissions = getMySubmissions(student);
-
+        int totalTickets = (student.getFeeStatus() == FeeStatus.PAID) ? 2 : 1;
         List<SubmissionInfoRes.PredictionResWrapper> submissionDtos = mySubmissions.stream()
                 .map(sub -> new SubmissionInfoRes.PredictionResWrapper(
                         sub.getPredictionList().stream()
@@ -65,7 +65,7 @@ public class StudentService {
                 ))
                 .toList();
 
-        return new SubmissionInfoRes(remainingTickets, submissionDtos);
+        return new SubmissionInfoRes(totalTickets, remainingTickets, submissionDtos);
     }
 
     public ResponseCookie signup(ReqSignup reqSignup, HttpServletRequest request, HttpServletResponse response) {

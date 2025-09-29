@@ -15,15 +15,5 @@ public class PaidStudent {
     @GeneratedValue
     private Long id;
 
-    private String major;
-
     private String studentId;
-
-    private String name;
-
-    public PaidStudent(String major, String studentId, String name) {
-        this.major = major;
-        this.studentId = studentId;
-        this.name = name;
-    }
 }

@@ -6,6 +6,7 @@ import com.sku_sku.MatchPrediction.enums.SportType;
 import java.util.List;
 
 public record SubmissionInfoRes(
+        int totalTickets,
         int remainingTickets,
         List<PredictionResWrapper> submissions
 ) {

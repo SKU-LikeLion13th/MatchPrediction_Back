@@ -28,8 +28,8 @@ public class OAuth2Controller {
     }
 
     @PostMapping("/out")
-    public ResponseEntity<String> logout(HttpServletResponse response, Authentication auth) {
-        oAuth2Service.logout(response, auth.getName());
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
+        oAuth2Service.logout(request, response, auth.getName());
         return ResponseEntity.status(HttpStatus.OK).body("로그아웃 성공");
     }
 

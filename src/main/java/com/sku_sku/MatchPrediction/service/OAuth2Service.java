@@ -66,6 +66,10 @@ public class OAuth2Service {
                 .build();
 
         response.addHeader("Set-Cookie", deleteToken.toString());
+
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
     }
 
     public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {

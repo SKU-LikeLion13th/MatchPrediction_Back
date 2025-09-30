@@ -9,7 +9,6 @@ public record PredictionStatisticsBySportRes(
         PredictionResult gameResult,
         List<PredictionResWrapper> predictions
 ) {
-    // 종목별 통계 안의 개별 예측
     public record PredictionResWrapper(
             String predictionResult,
             int percentage

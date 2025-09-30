@@ -9,9 +9,11 @@ import com.sku_sku.MatchPrediction.reposiroty.StudentReposiroty;
 import com.sku_sku.MatchPrediction.security.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -53,7 +55,7 @@ public class OAuth2Service {
         );
     }
 
-    public void logout(HttpServletResponse response, String email) {
+    public void logout(HttpServletRequest request, HttpServletResponse response, String email) {
         String redisKey = "refresh:" + email;
         redisTemplate.delete(redisKey);
 
@@ -64,13 +66,23 @@ public class OAuth2Service {
                 .path("/")
                 .maxAge(0)
                 .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteToken.toString());
 
-        response.addHeader("Set-Cookie", deleteToken.toString());
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        ResponseCookie deleteJSession = ResponseCookie.from("JSESSIONID", "")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteJSession.toString());
 
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
     }
+
 
     public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
         String token = jwtUtility.extractTokenFromCookies(request);
